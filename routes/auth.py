@@ -1,7 +1,11 @@
 from sanic import Blueprint, response
 from database import SessionLocal
 from models import User
+from utils import generate_jwt_token# get_user_id_from_token
 import hashlib
+import os
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 bp = Blueprint("auth", url_prefix="/auth")
 
@@ -37,6 +41,8 @@ async def login(request):
         return response.json({"error": "Invalid credentials"}, status=401)
 
     # You can include JWT token generation here
+    # nty
 
     db.close()
-    return response.json({"message": "Login successful"})
+    token = generate_jwt_token(user.id, SECRET_KEY, expires_in=3600)
+    return response.json({"message": "Login successful", "access_token" : token})
